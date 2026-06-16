@@ -1,0 +1,414 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: TrackNova public transport tracking API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: routes
+    description: Transport routes
+  - name: stops
+    description: Bus/MTC stops
+  - name: vehicles
+    description: Live vehicle tracking
+  - name: favorites
+    description: User favorite routes and stops
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /routes:
+    get:
+      operationId: listRoutes
+      tags: [routes]
+      summary: List all transport routes
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [bus, metro, suburban-rail]
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of routes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Route"
+
+  /routes/{id}:
+    get:
+      operationId: getRoute
+      tags: [routes]
+      summary: Get route details with stops
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Route detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RouteDetail"
+        "404":
+          description: Not found
+
+  /stops:
+    get:
+      operationId: listStops
+      tags: [stops]
+      summary: List all stops
+      parameters:
+        - name: lat
+          in: query
+          schema:
+            type: number
+        - name: lng
+          in: query
+          schema:
+            type: number
+        - name: radius
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: List of stops
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Stop"
+
+  /stops/{id}:
+    get:
+      operationId: getStop
+      tags: [stops]
+      summary: Get stop details with upcoming arrivals
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Stop detail with arrivals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StopDetail"
+        "404":
+          description: Not found
+
+  /vehicles:
+    get:
+      operationId: listVehicles
+      tags: [vehicles]
+      summary: Get live vehicle positions for a route
+      parameters:
+        - name: routeId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Live vehicles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Vehicle"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [routes]
+      summary: Dashboard stats summary
+      responses:
+        "200":
+          description: Summary stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /favorites:
+    get:
+      operationId: listFavorites
+      tags: [favorites]
+      summary: Get user favorite routes and stops
+      responses:
+        "200":
+          description: User favorites
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoritesResponse"
+    post:
+      operationId: addFavorite
+      tags: [favorites]
+      summary: Add a favorite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FavoriteInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Favorite"
+
+  /favorites/{id}:
+    delete:
+      operationId: removeFavorite
+      tags: [favorites]
+      summary: Remove a favorite
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    Route:
+      type: object
+      required: [id, name, number, type, color, startStop, endStop, totalStops, frequency]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        number:
+          type: string
+        type:
+          type: string
+          enum: [bus, metro, suburban-rail]
+        color:
+          type: string
+        startStop:
+          type: string
+        endStop:
+          type: string
+        totalStops:
+          type: integer
+        frequency:
+          type: string
+        isActive:
+          type: boolean
+
+    RouteDetail:
+      type: object
+      required: [id, name, number, type, color, stops]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        number:
+          type: string
+        type:
+          type: string
+        color:
+          type: string
+        startStop:
+          type: string
+        endStop:
+          type: string
+        frequency:
+          type: string
+        isActive:
+          type: boolean
+        stops:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stop"
+
+    Stop:
+      type: object
+      required: [id, name, lat, lng, type]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+        type:
+          type: string
+          enum: [bus, metro, suburban-rail]
+        address:
+          type: ["string", "null"]
+        routeIds:
+          type: array
+          items:
+            type: integer
+
+    StopDetail:
+      type: object
+      required: [id, name, lat, lng, type, arrivals]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+        type:
+          type: string
+        address:
+          type: ["string", "null"]
+        arrivals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Arrival"
+
+    Arrival:
+      type: object
+      required: [routeId, routeNumber, routeName, minutesAway, vehicleId]
+      properties:
+        routeId:
+          type: integer
+        routeNumber:
+          type: string
+        routeName:
+          type: string
+        minutesAway:
+          type: integer
+        vehicleId:
+          type: string
+        direction:
+          type: string
+
+    Vehicle:
+      type: object
+      required: [id, routeId, lat, lng, speed, direction, occupancy, lastUpdated]
+      properties:
+        id:
+          type: string
+        routeId:
+          type: integer
+        lat:
+          type: number
+        lng:
+          type: number
+        speed:
+          type: number
+        direction:
+          type: number
+        occupancy:
+          type: string
+          enum: [low, medium, high]
+        lastUpdated:
+          type: string
+
+    DashboardSummary:
+      type: object
+      required: [totalRoutes, activeVehicles, totalStops, onTimePercentage, routesByType]
+      properties:
+        totalRoutes:
+          type: integer
+        activeVehicles:
+          type: integer
+        totalStops:
+          type: integer
+        onTimePercentage:
+          type: number
+        routesByType:
+          type: object
+          properties:
+            bus:
+              type: integer
+            metro:
+              type: integer
+            suburban-rail:
+              type: integer
+
+    FavoritesResponse:
+      type: object
+      required: [routes, stops]
+      properties:
+        routes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Favorite"
+        stops:
+          type: array
+          items:
+            $ref: "#/components/schemas/Favorite"
+
+    Favorite:
+      type: object
+      required: [id, userId, itemId, itemType, itemName]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        itemId:
+          type: integer
+        itemType:
+          type: string
+          enum: [route, stop]
+        itemName:
+          type: string
+
+    FavoriteInput:
+      type: object
+      required: [itemId, itemType, itemName]
+      properties:
+        itemId:
+          type: integer
+        itemType:
+          type: string
+          enum: [route, stop]
+        itemName:
+          type: string

@@ -1,0 +1,11 @@
+2026-05-29 23:43:11.934 IST [34924] LOG:  starting PostgreSQL 16.14, compiled by Visual C++ build 1944, 64-bit
+2026-05-29 23:43:11.991 IST [34924] LOG:  listening on IPv6 address "::1", port 5433
+2026-05-29 23:43:11.991 IST [34924] LOG:  listening on IPv4 address "127.0.0.1", port 5433
+2026-05-29 23:43:12.084 IST [41792] LOG:  database system was shut down at 2026-05-29 23:43:09 IST
+2026-05-29 23:43:12.116 IST [34924] LOG:  database system is ready to accept connections
+2026-05-29 23:45:31.329 IST [24756] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-05-29 23:48:12.078 IST [16320] LOG:  checkpoint starting: time
+2026-05-29 23:50:04.514 IST [16320] LOG:  checkpoint complete: wrote 1029 buffers (6.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=112.158 s, sync=0.268 s, total=112.437 s; sync files=334, longest=0.004 s, average=0.001 s; distance=4892 kB, estimate=4892 kB; lsn=0/1A3F408, redo lsn=0/1A3F3D0
+2026-05-31 18:23:02.289 IST [16320] LOG:  checkpoint starting: time
+2026-05-31 18:23:04.431 IST [16320] LOG:  checkpoint complete: wrote 20 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.096 s, sync=0.019 s, total=2.146 s; sync files=16, longest=0.003 s, average=0.002 s; distance=6 kB, estimate=4404 kB; lsn=0/1A40FB8, redo lsn=0/1A40F80
