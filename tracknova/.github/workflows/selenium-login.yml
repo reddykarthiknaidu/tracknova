@@ -55,6 +55,7 @@ jobs:
       
     - name: Run Backend API Server in Background
       run: |
+        pnpm --filter @workspace/api-server run build
         pnpm --filter @workspace/api-server run start &
         sleep 5
         
