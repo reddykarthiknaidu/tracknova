@@ -9,6 +9,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 123456
+          POSTGRES_DB: tracknova
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -24,12 +39,24 @@ jobs:
         node-version: '20'
         cache: 'pnpm'
         
+    - name: Create .env file
+      run: |
+        echo "DATABASE_URL=postgresql://postgres:123456@localhost:5432/tracknova" > .env
+        echo "PORT=8080" >> .env
+        echo "SESSION_SECRET=ci-secret" >> .env
+        echo "VITE_CLERK_PUBLISHABLE_KEY=pk_test_ZGVjaWRpbmctZWFyd2lnLTcwLmNsZXJrLmFjY291bnRzLmRldiQ" >> .env
+        
     - name: Install Dependencies
       run: pnpm install
       
     - name: Build Project
       run: pnpm run build
       
+    - name: Run Backend API Server in Background
+      run: |
+        pnpm --filter @workspace/api-server run start &
+        sleep 5
+        
     - name: Setup Chrome WebDriver
       uses: nanasess/setup-chromedriver@v2
       
@@ -37,11 +64,11 @@ jobs:
       working-directory: ./frontend/selenium-tests
       run: npm install
       
-    - name: Run Dev Server in Background
+    - name: Run Frontend Dev Server in Background
       run: |
         pnpm --filter @workspace/tracknova run dev &
-        sleep 10 # Wait for server to start
+        sleep 10
       
     - name: Run Selenium E2E Tests
       working-directory: ./frontend/selenium-tests
-      run: npm run login
+      run: npm run test

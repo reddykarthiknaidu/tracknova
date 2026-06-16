@@ -1,19 +1,30 @@
+const { test, describe, before, after, it } = require('node:test');
 const { Builder, By, until } = require('selenium-webdriver');
-const assert = require('assert');
+const assert = require('node:assert');
 
-describe('Login Test', function() {
-  this.timeout(30000); // 30 seconds timeout
+describe('Login Test', { timeout: 30000 }, () => {
   let driver;
 
-  before(async function() {
-    driver = await new Builder().forBrowser('chrome').build();
+  before(async () => {
+    const chrome = require('selenium-webdriver/chrome');
+    let options = new chrome.Options();
+    options.addArguments('--headless=new');
+    options.addArguments('--no-sandbox');
+    options.addArguments('--disable-dev-shm-usage');
+
+    driver = await new Builder()
+      .forBrowser('chrome')
+      .setChromeOptions(options)
+      .build();
   });
 
-  after(async function() {
-    await driver.quit();
+  after(async () => {
+    if (driver) {
+      await driver.quit();
+    }
   });
 
-  it('should navigate to login page when clicking sign in', async function() {
+  it('should navigate to login page when clicking sign in', async () => {
     // Navigate to homepage
     await driver.get('http://localhost:3000');
     
