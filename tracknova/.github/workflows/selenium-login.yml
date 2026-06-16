@@ -1,9 +1,10 @@
-name: Selenium CI/CD
+name: Selenium E2E Tests
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   test:
