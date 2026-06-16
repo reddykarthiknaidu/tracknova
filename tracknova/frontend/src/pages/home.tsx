@@ -25,7 +25,7 @@ export default function HomePage() {
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </Button>
-        <Button asChild size="lg" variant="outline" className="h-14 px-8 text-lg font-bold rounded-xl border-2 hover:bg-zinc-100 dark:hover:bg-zinc-900" data-testid="button-sign-in">
+        <Button asChild size="lg" variant="outline" className="h-14 px-8 text-lg font-bold rounded-xl border-2 hover:bg-zinc-100 dark:hover:bg-zinc-900" data-testid="button-sign-in" id="login-button">
           <Link href="/sign-in">
             Sign In
           </Link>

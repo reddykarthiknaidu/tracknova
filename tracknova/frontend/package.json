@@ -1,15 +1,19 @@
 {
   "name": "@workspace/tracknova",
   "version": "0.0.0",
+  "homepage": "https://reddykarthiknaidu.github.io/tracknova",
   "private": true,
   "type": "module",
   "scripts": {
+    "predeploy": "pnpm run build",
+    "deploy": "gh-pages -d dist/public",
     "dev": "vite --config vite.config.ts --host 0.0.0.0",
     "build": "vite build --config vite.config.ts",
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
+    "gh-pages": "^6.1.1",
     "@esbuild/win32-x64": "0.27.3",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.4",

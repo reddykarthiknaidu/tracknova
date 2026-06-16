@@ -3,6 +3,7 @@ import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { shadcn } from "@clerk/themes";
 import { Switch, Route, useLocation, Router as WouterRouter, Redirect } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { QueryClient } from "@tanstack/react-query";
 
@@ -211,7 +212,7 @@ function ClerkProviderWithRoutes() {
 
 function App() {
   return (
-    <WouterRouter base={basePath}>
+    <WouterRouter base={basePath} hook={useHashLocation}>
       <ClerkProviderWithRoutes />
     </WouterRouter>
   );
